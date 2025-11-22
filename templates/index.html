@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sentiment Analyzer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="container">
+    <h2>Sentiment Analyzer</h2>
+    
+    <!-- Wrapped input inside a form to support Enter -->
+    <form onsubmit="analyze(); return false;">
+      <input type="text" id="Sentence" placeholder="Type your sentence here..." />
+      <button type="submit">Check</button>
+    </form>
+    
+    <p id="result"></p>
+  </div>
+
+  <script>
+    async function analyze() {
+      const Sentence = document.getElementById('Sentence').value.trim();
+      if (!Sentence) {
+        alert("Please enter a sentence.");
+        return;
+      }
+
+      const response = await fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ Sentence })
+      });
+
+      const data = await response.json();
+      const resultEl = document.getElementById('result');
+      resultEl.innerText = `${data.Emoji} Sentiment: ${data.Sentiment}`;
+      resultEl.className = ''; // Reset
+
+      if (data.Sentiment === "Positive") resultEl.classList.add('positive');
+      else if (data.Sentiment === "Negative") resultEl.classList.add('negative');
+      else resultEl.classList.add('unknown');
+    }
+  </script>
+</body>
+</html>
